@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mario Herrero Delgado — CTO & Digital Architect</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --bg2: #0f0f1a;
+    --panel: #12121f;
+    --panel2: #1a1a2e;
+    --border: #2a2a4a;
+    --accent: #00d4ff;
+    --accent2: #7b2fff;
+    --accent3: #ff6b35;
+    --gold: #ffd700;
+    --green: #00ff88;
+    --red: #ff3366;
+    --text: #e0e0ff;
+    --muted: #6a6a9a;
+    --glow: 0 0 20px rgba(0,212,255,0.4);
+    --glow2: 0 0 20px rgba(123,47,255,0.4);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* SCANLINES overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.08) 2px,
+      rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* GRID BACKGROUND */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ===== HEADER / HERO ===== */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    padding: 2rem;
+    z-index: 1;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(123,47,255,0.15) 0%, transparent 70%),
+                radial-gradient(ellipse 50% 40% at 20% 80%, rgba(0,212,255,0.1) 0%, transparent 60%);
+  }
+
+  .hero-corner {
+    position: absolute;
+    width: 80px; height: 80px;
+    border-color: var(--accent);
+    border-style: solid;
+    opacity: 0.5;
+  }
+  .hero-corner.tl { top: 20px; left: 20px; border-width: 2px 0 0 2px; }
+  .hero-corner.tr { top: 20px; right: 20px; border-width: 2px 2px 0 0; }
+  .hero-corner.bl { bottom: 20px; left: 20px; border-width: 0 0 2px 2px; }
+  .hero-corner.br { bottom: 20px; right: 20px; border-width: 0 2px 2px 0; }
+
+  .player-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    z-index: 2;
+    animation: fadeUp 0.8s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .avatar-frame {
+    position: relative;
+    width: 140px; height: 140px;
+  }
+
+  .avatar-frame img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid var(--accent);
+    box-shadow: var(--glow), 0 0 60px rgba(0,212,255,0.2);
+    filter: saturate(1.2);
+  }
+
+  .avatar-lvl {
+    position: absolute;
+    bottom: -8px; right: -8px;
+    background: var(--accent2);
+    color: white;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    padding: 5px 8px;
+    border-radius: 4px;
+    box-shadow: var(--glow2);
+    white-space: nowrap;
+  }
+
+  .avatar-ring {
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 2px dashed rgba(0,212,255,0.3);
+    animation: spin 20s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .player-class {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    animation: fadeUp 0.8s 0.1s ease both;
+  }
+
+  .hero h1 {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(2rem, 6vw, 4.5rem);
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    line-height: 1.1;
+    background: linear-gradient(135deg, #fff 0%, var(--accent) 50%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: fadeUp 0.8s 0.2s ease both;
+  }
+
+  .hero-subtitle {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    animation: fadeUp 0.8s 0.3s ease both;
+  }
+
+  .hero-subtitle span { color: var(--accent3); }
+
+  /* XP BAR */
+  .xp-section {
+    width: min(500px, 90vw);
+    animation: fadeUp 0.8s 0.4s ease both;
+  }
+
+  .xp-label {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 7px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .xp-bar {
+    height: 12px;
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .xp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent2), var(--accent));
+    width: 0;
+    border-radius: 2px;
+    box-shadow: 0 0 10px var(--accent);
+    animation: xpGrow 2s 1s ease forwards;
+  }
+
+  @keyframes xpGrow { to { width: 87%; } }
+
+  /* STATS ROW */
+  .stats-row {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    animation: fadeUp 0.8s 0.5s ease both;
+  }
+
+  .stat-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 16px;
+    min-width: 80px;
+  }
+
+  .stat-badge .num {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .stat-badge .lbl {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    animation: fadeUp 0.8s 0.6s ease both;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 4px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+    border: 2px solid transparent;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: var(--bg);
+    box-shadow: var(--glow);
+  }
+
+  .btn-primary:hover {
+    background: transparent;
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow: var(--glow), inset 0 0 20px rgba(0,212,255,0.1);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--accent2);
+    border-color: var(--accent2);
+    box-shadow: var(--glow2);
+  }
+
+  .btn-secondary:hover {
+    background: var(--accent2);
+    color: white;
+  }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 7px;
+    color: var(--muted);
+    animation: bounce 2s infinite, fadeUp 1s 1s ease both;
+    z-index: 2;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(8px); }
+  }
+
+  /* ===== SECTION LAYOUT ===== */
+  .section {
+    position: relative;
+    padding: 5rem 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    z-index: 1;
+  }
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 3rem;
+  }
+
+  .section-title .icon {
+    font-size: 1.5rem;
+  }
+
+  .section-title h2 {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .section-title .line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+  }
+
+  .section-title .tag {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 7px;
+    color: var(--accent2);
+    background: rgba(123,47,255,0.1);
+    border: 1px solid var(--accent2);
+    padding: 4px 8px;
+    border-radius: 3px;
+  }
+
+  /* ===== QUEST LOG (Experiencia) ===== */
+  .quest-log {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .quest-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .quest-card:hover {
+    border-color: var(--accent);
+    box-shadow: var(--glow);
+    transform: translateX(4px);
+  }
+
+  .quest-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    border-radius: 4px 0 0 4px;
+  }
+
+  .quest-card.main::before { background: var(--accent); }
+  .quest-card.secondary::before { background: var(--accent2); }
+  .quest-card.side::before { background: var(--accent3); }
+  .quest-card.completed::before { background: var(--green); }
+
+  .quest-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .quest-title-group h3 {
+    font-family: 'Orbitron', monospace;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+
+  .quest-title-group .company {
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .quest-badges {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 6px;
+    padding: 4px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .badge.main { background: rgba(0,212,255,0.15); color: var(--accent); border: 1px solid rgba(0,212,255,0.3); }
+  .badge.side { background: rgba(255,107,53,0.15); color: var(--accent3); border: 1px solid rgba(255,107,53,0.3); }
+  .badge.done { background: rgba(0,255,136,0.15); color: var(--green); border: 1px solid rgba(0,255,136,0.3); }
+  .badge.active { background: rgba(123,47,255,0.15); color: var(--accent2); border: 1px solid rgba(123,47,255,0.3); }
+
+  .quest-date {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 7px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .quest-body {
+    font-size: 0.9rem;
+    color: #a0a0c0;
+    line-height: 1.7;
+    margin-bottom: 1rem;
+  }
+
+  .quest-rewards {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .reward-tag {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    transition: all 0.2s;
+  }
+
+  .reward-tag:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .quest-achievement {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 0.75rem;
+    padding: 8px 12px;
+    background: rgba(0,255,136,0.05);
+    border: 1px solid rgba(0,255,136,0.2);
+    border-radius: 4px;
+    font-size: 0.8rem;
+    color: var(--green);
+    font-weight: 600;
+  }
+
+  /* ===== SKILLS TREE ===== */
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .skill-category {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    transition: all 0.3s;
+  }
+
+  .skill-category:hover {
+    border-color: var(--accent2);
+    box-shadow: var(--glow2);
+  }
+
+  .skill-cat-title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    color: var(--accent2);
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .skill-cat-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .skill-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 1rem;
+  }
+
+  .skill-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .skill-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .skill-pct {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+  }
+
+  .skill-bar {
+    height: 6px;
+    background: var(--panel2);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .skill-fill {
+    height: 100%;
+    border-radius: 3px;
+    width: 0;
+    transition: width 1.5s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .skill-fill.crm { background: linear-gradient(90deg, var(--accent2), var(--accent)); }
+  .skill-fill.dev { background: linear-gradient(90deg, var(--accent3), var(--gold)); }
+  .skill-fill.soft { background: linear-gradient(90deg, var(--green), var(--accent)); }
+  .skill-fill.design { background: linear-gradient(90deg, #ff6b9d, var(--accent2)); }
+
+  /* ===== INVENTORY (Herramientas) ===== */
+  .inventory-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 1rem;
+  }
+
+  .inv-slot {
+    background: var(--panel);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 0.75rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .inv-slot:hover {
+    border-color: var(--accent);
+    transform: translateY(-4px);
+    box-shadow: var(--glow);
+  }
+
+  .inv-slot .icon {
+    font-size: 1.8rem;
+    line-height: 1;
+  }
+
+  .inv-slot .name {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--muted);
+    text-align: center;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .inv-slot .rarity {
+    position: absolute;
+    top: 4px; right: 4px;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+  }
+
+  .rarity.legendary { background: var(--gold); box-shadow: 0 0 6px var(--gold); }
+  .rarity.epic { background: var(--accent2); box-shadow: 0 0 6px var(--accent2); }
+  .rarity.rare { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+  .rarity.common { background: var(--muted); }
+
+  /* RARITY LEGEND */
+  .rarity-legend {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .rarity-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 7px;
+    color: var(--muted);
+  }
+
+  .rarity-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+  }
+
+  /* ===== ACHIEVEMENTS ===== */
+  .achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+  }
+
+  .achievement {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    transition: all 0.3s;
+  }
+
+  .achievement:hover {
+    border-color: var(--gold);
+    box-shadow: 0 0 20px rgba(255,215,0,0.2);
+  }
+
+  .achievement.locked {
+    opacity: 0.4;
+    filter: grayscale(1);
+  }
+
+  .ach-icon {
+    font-size: 2rem;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .ach-info h4 {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--gold);
+    margin-bottom: 4px;
+  }
+
+  .ach-info p {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  .ach-xp {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 7px;
+    color: var(--accent);
+    margin-top: 6px;
+  }
+
+  /* ===== CONTACT / GUILD ===== */
+  .guild-panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .guild-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(123,47,255,0.15), transparent 70%);
+  }
+
+  .guild-panel h3 {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+    position: relative;
+  }
+
+  .guild-panel p {
+    color: var(--muted);
+    margin-bottom: 2rem;
+    font-size: 1.05rem;
+    position: relative;
+  }
+
+  .contact-links {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    position: relative;
+  }
+
+  .contact-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 24px;
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+  }
+
+  .contact-link:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: var(--glow);
+  }
+
+  .contact-link .cl-icon { font-size: 1.2rem; }
+
+  /* ===== NAV ===== */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    background: rgba(10,10,15,0.9);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-logo {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    color: var(--accent);
+    text-decoration: none;
+    letter-spacing: 0.1em;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 1.5rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 7px;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--accent); }
+
+  /* ===== FOOTER ===== */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem;
+    text-align: center;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 7px;
+    color: var(--muted);
+    z-index: 1;
+    position: relative;
+    line-height: 2;
+  }
+
+  footer span { color: var(--accent); }
+
+  /* ===== PARTICLE FLOATING ===== */
+  .particles {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .particle {
+    position: absolute;
+    width: 2px; height: 2px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: float linear infinite;
+    opacity: 0;
+  }
+
+  @keyframes float {
+    0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-10vh) translateX(50px); opacity: 0; }
+  }
+
+  /* GLITCH text effect */
+  @keyframes glitch {
+    0%, 100% { text-shadow: none; }
+    20% { text-shadow: -2px 0 var(--accent2), 2px 0 var(--red); }
+    40% { text-shadow: 2px 0 var(--accent), -2px 0 var(--accent3); }
+    60% { text-shadow: none; }
+  }
+
+  .glitch:hover { animation: glitch 0.3s ease; }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    nav .nav-links { display: none; }
+    .hero h1 { font-size: 1.8rem; }
+    .inventory-grid { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); }
+  }
+
+  /* Scroll animations */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Typing cursor */
+  .typed::after {
+    content: '|';
+    animation: blink 1s step-end infinite;
+    color: var(--accent);
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* Divider */
+  .section-divider {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 0 auto;
+  }
+</style>
+</head>
+<body>
+
+<!-- PARTICLES -->
+<div class="particles" id="particles"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#hero" class="nav-logo">MHD.exe</a>
+  <ul class="nav-links">
+    <li><a href="#experiencia">QUESTS</a></li>
+    <li><a href="#habilidades">SKILLS</a></li>
+    <li><a href="#tools">INVENTORY</a></li>
+    <li><a href="#logros">LOGROS</a></li>
+    <li><a href="#contacto">GUILD</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-corner tl"></div>
+  <div class="hero-corner tr"></div>
+  <div class="hero-corner bl"></div>
+  <div class="hero-corner br"></div>
+
+  <div class="player-card">
+    <div class="avatar-frame">
+      <div class="avatar-ring"></div>
+      <!-- Placeholder avatar SVG since no image available -->
+      <svg viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;border-radius:50%;border:3px solid var(--accent);box-shadow:var(--glow),0 0 60px rgba(0,212,255,0.2);">
+        <defs>
+          <radialGradient id="avatarBg" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#1a1a3e"/>
+            <stop offset="100%" stop-color="#0a0a1f"/>
+          </radialGradient>
+          <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#00d4ff"/>
+            <stop offset="100%" stop-color="#7b2fff"/>
+          </linearGradient>
+        </defs>
+        <circle cx="70" cy="70" r="70" fill="url(#avatarBg)"/>
+        <!-- Body -->
+        <circle cx="70" cy="55" r="22" fill="url(#accentGrad)" opacity="0.9"/>
+        <rect x="38" y="88" width="64" height="42" rx="32" fill="url(#accentGrad)" opacity="0.7"/>
+        <!-- Face details -->
+        <circle cx="62" cy="52" r="4" fill="#fff" opacity="0.9"/>
+        <circle cx="78" cy="52" r="4" fill="#fff" opacity="0.9"/>
+        <path d="M62 65 Q70 72 78 65" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <!-- Shield icon -->
+        <path d="M60 100 L70 95 L80 100 L80 110 Q70 118 60 110 Z" fill="rgba(255,215,0,0.6)" stroke="var(--gold)" stroke-width="1"/>
+        <text x="70" y="111" text-anchor="middle" fill="#0a0a1f" font-size="7" font-weight="bold" font-family="monospace">CTO</text>
+      </svg>
+      <div class="avatar-lvl">LVL 8+</div>
+    </div>
+
+    <div class="player-class">◆ CTO & Digital Architect ◆</div>
+
+    <h1 class="glitch">MARIO HERRERO<br>DELGADO</h1>
+
+    <p class="hero-subtitle">Especialista en <span>Zoho One</span> · CRM/ERP · Automatización · <span>Transformación Digital</span></p>
+
+    <div class="xp-section">
+      <div class="xp-label">
+        <span>EXPERIENCIA XP</span>
+        <span>8+ AÑOS</span>
+      </div>
+      <div class="xp-bar">
+        <div class="xp-fill"></div>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-badge">
+        <span class="num">8+</span>
+        <span class="lbl">Años<br>EXP</span>
+      </div>
+      <div class="stat-badge">
+        <span class="num">30%</span>
+        <span class="lbl">Reducción<br>Tiempos</span>
+      </div>
+      <div class="stat-badge">
+        <span class="num">15+</span>
+        <span class="lbl">Apps<br>Zoho</span>
+      </div>
+      <div class="stat-badge">
+        <span class="num">3</span>
+        <span class="lbl">Roles<br>Activos</span>
+      </div>
+    </div>
+
+    <div class="hero-cta">
+      <a href="mailto:herrerodelgadomario@gmail.com" class="btn btn-primary">▶ CONTACTAR</a>
+      <a href="https://linkedin.com/in/marioherrerod" target="_blank" class="btn btn-secondary">⟡ LINKEDIN</a>
+    </div>
+  </div>
+
+  <div class="scroll-hint">▼ SCROLL TO EXPLORE ▼</div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- EXPERIENCIA / QUEST LOG -->
+<section class="section" id="experiencia">
+  <div class="section-title reveal">
+    <span class="icon">📜</span>
+    <h2>Quest Log</h2>
+    <div class="line"></div>
+    <span class="tag">EXPERIENCIA</span>
+  </div>
+
+  <div class="quest-log">
+
+    <!-- Sinergia FP -->
+    <div class="quest-card main reveal">
+      <div class="quest-header">
+        <div class="quest-title-group">
+          <h3>Chief Technology Officer</h3>
+          <div class="company">Sinergia FP · Madrid, España</div>
+        </div>
+        <div class="quest-badges">
+          <span class="badge active">◉ ACTIVO</span>
+          <span class="badge main">MAIN QUEST</span>
+          <span class="quest-date">SEP 2025 →</span>
+        </div>
+      </div>
+      <div class="quest-body">
+        Lidero la transformación digital del centro de FP. Gestiono la implementación y configuración del ecosistema Zoho One, analizo y mejoro procesos internos en departamentos académico, comercial y administrativo. Integro sistemas mediante APIs y automatizaciones en Deluge, impulsando la innovación operativa.
+      </div>
+      <div class="quest-rewards">
+        <span class="reward-tag">Zoho One</span>
+        <span class="reward-tag">Deluge</span>
+        <span class="reward-tag">APIs</span>
+        <span class="reward-tag">Digital Transformation</span>
+        <span class="reward-tag">Team Leadership</span>
+      </div>
+    </div>
+
+    <!-- Agencia Reinicia -->
+    <div class="quest-card secondary reveal">
+      <div class="quest-header">
+        <div class="quest-title-group">
+          <h3>Consultor Senior</h3>
+          <div class="company">Agencia Reinicia · Madrid, España</div>
+        </div>
+        <div class="quest-badges">
+          <span class="badge active">◉ ACTIVO</span>
+          <span class="badge main">MAIN QUEST</span>
+          <span class="quest-date">MAY 2024 →</span>
+        </div>
+      </div>
+      <div class="quest-body">
+        Experto en Zoho CRM y desarrollo de negocio. Desarrollo completo con la Suite de Zoho. Conocimiento en HubSpot CRM, Salesforce, Ringover, Woztell, WordPress. Creación de diagramas de procesos, optimización de customer journeys y metodología Agile.
+      </div>
+      <div class="quest-rewards">
+        <span class="reward-tag">Zoho CRM</span>
+        <span class="reward-tag">HubSpot</span>
+        <span class="reward-tag">Salesforce</span>
+        <span class="reward-tag">Agile</span>
+        <span class="reward-tag">Customer Journey</span>
+        <span class="reward-tag">Woztell</span>
+      </div>
+    </div>
+
+    <!-- Grupo Colón -->
+    <div class="quest-card completed reveal">
+      <div class="quest-header">
+        <div class="quest-title-group">
+          <h3>Manager CRM/ERP + Formador</h3>
+          <div class="company">Grupo Colón - IECM · Madrid, España</div>
+        </div>
+        <div class="quest-badges">
+          <span class="badge done">✓ COMPLETADO</span>
+          <span class="quest-date">OCT 2018 → MAY 2024</span>
+        </div>
+      </div>
+      <div class="quest-body">
+        Experto en CRM/ERP, marketing y aulas virtuales. Implementación y personalización de soluciones Zoho para optimizar procesos comerciales. Creación de automatismos con Zoho Flow. Supervisión de proyectos del departamento. Impartición de formaciones en Administración, CRM, Marketing, Wordpress, Diseño gráfico, Branding, Zoho Suite y Hostelería.
+      </div>
+      <div class="quest-achievement">
+        🏆 Achievement unlocked: Reducción del 30% en tiempos de gestión gracias a automatizaciones Zoho
+      </div>
+      <div class="quest-rewards">
+        <span class="reward-tag">Zoho CRM</span>
+        <span class="reward-tag">Zoho Books</span>
+        <span class="reward-tag">Zoho Creator</span>
+        <span class="reward-tag">Zoho Flow</span>
+        <span class="reward-tag">Analytics</span>
+        <span class="reward-tag">Formación</span>
+      </div>
+    </div>
+
+    <!-- Grupo VIPS -->
+    <div class="quest-card side reveal">
+      <div class="quest-header">
+        <div class="quest-title-group">
+          <h3>Formador | Consultor de Aperturas</h3>
+          <div class="company">Grupo VIPS & ALSEA Iberia · Madrid, España</div>
+        </div>
+        <div class="quest-badges">
+          <span class="badge done">✓ COMPLETADO</span>
+          <span class="badge side">SIDE QUEST</span>
+          <span class="quest-date">SEP 2014 → JUL 2017</span>
+        </div>
+      </div>
+      <div class="quest-body">
+        Experiencia en formación, consultoría de aperturas y desarrollo de negocio en entornos de hostelería y restauración. Gestión y coordinación de proyectos de expansión.
+      </div>
+      <div class="quest-rewards">
+        <span class="reward-tag">Formación</span>
+        <span class="reward-tag">Hostelería</span>
+        <span class="reward-tag">Consultoría</span>
+        <span class="reward-tag">Desarrollo Negocio</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- HABILIDADES / SKILL TREE -->
+<section class="section" id="habilidades">
+  <div class="section-title reveal">
+    <span class="icon">⚡</span>
+    <h2>Skill Tree</h2>
+    <div class="line"></div>
+    <span class="tag">HABILIDADES</span>
+  </div>
+
+  <div class="skills-grid">
+
+    <div class="skill-category reveal">
+      <div class="skill-cat-title">◈ CRM / ERP</div>
+      <div class="skill-item">
+        <div class="skill-info"><span class="skill-name">Zoho Suite</span><span class="skill-pct">98%</span></div>
+        <div class="skill-bar"><div class="skill-fill crm" data-width="98"></div></div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-info"><span class="skill-name">Zoho CRM / Deluge</span><span class="skill-pct">95%</span></div>
+        <div class="skill-bar"><div class="skill-fill crm" data-width="95"></div></div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-info"><span class="skill-name">HubSpot CRM</span><span class="skill-pct">80%</span></div>
+        <div class="skill-bar"><div class="skill-fill crm" data-width="80"></div></div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-info"><span class="skill-name">Salesforce</span><span class="skill-pct">70%</span></div>
+        <div class="skill-bar"><div class="skill-fill crm" data-width="70"></div></div>
+      </div>
+    </div>
+
+    <div class="skill-category reveal">
+      <div class="skill-cat-title">◈ DESARROLLO</div>
+      <div class="skill-item">
+        <div class="skill-info"><span class="skill-name">APIs & Integraciones</span><span class="skill-pct">90%</span></div>
+        <div class="skill-bar"><div class="skill-fill dev" data-width="90"></div></div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-info"><span class="skill-name">Deluge Script</span><span class="skill-pct">90%</span></div>
+        <div class="skill-bar"><div class="skill-fill dev" data-width="90"></div></div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-info"><span class="skill-name">HTML / CSS</span><span class="skill-pct">75%</span></div>
+        <div class="skill-bar"><div class="skill-fill dev" data-width="75"></div></div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-info"><span class="skill-name">WordPress</span><span class="skill-pct">80%</span></div>
+        <div class="skill-bar"><div class="skill-fill dev" data-width="80"></div></div>
+      </div>
+    </div>
+
+    <div class="skill-category reveal">
+      <div class="skill-cat-title">◈ DISEÑO & CONTENIDO</div>
+      <div class="skill-item">
+        <div class="skill-info"><span class="skill-name">Diseño Gráfico</span><span class="skill-pct">88%</span></div>
+        <div class="skill-bar"><div class="skill-fill design" data-width="88"></div></div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-info"><span class="skill-name">Imagen de Marca</span><span class="skill-pct">85%</span></div>
+        <div class="skill-bar"><div class="skill-fill design" data-width="85"></div></div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-info"><span class="skill-name">Contenidos Audiovisuales</span><span class="skill-pct">82%</span></div>
+        <div class="skill-bar"><div class="skill-fill design" data-width="82"></div></div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-info"><span class="skill-name">Chatbots (Web/WhatsApp)</span><span class="skill-pct">85%</span></div>
+        <div class="skill-bar"><div class="skill-fill design" data-width="85"></div></div>
+      </div>
+    </div>
+
+    <div class="skill-category reveal">
+      <div class="skill-cat-title">◈ SOFT SKILLS</div>
+      <div class="skill-item">
+        <div class="skill-info"><span class="skill-name">Liderazgo de Equipos</span><span class="skill-pct">95%</span></div>
+        <div class="skill-bar"><div class="skill-fill soft" data-width="95"></div></div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-info"><span class="skill-name">Análisis de Negocio</span><span class="skill-pct">92%</span></div>
+        <div class="skill-bar"><div class="skill-fill soft" data-width="92"></div></div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-info"><span class="skill-name">Formación / Docencia</span><span class="skill-pct">95%</span></div>
+        <div class="skill-bar"><div class="skill-fill soft" data-width="95"></div></div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-info"><span class="skill-name">Inglés Profesional</span><span class="skill-pct">80%</span></div>
+        <div class="skill-bar"><div class="skill-fill soft" data-width="80"></div></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- INVENTORY / TOOLS -->
+<section class="section" id="tools">
+  <div class="section-title reveal">
+    <span class="icon">🎒</span>
+    <h2>Inventory</h2>
+    <div class="line"></div>
+    <span class="tag">HERRAMIENTAS</span>
+  </div>
+
+  <div class="rarity-legend reveal">
+    <div class="rarity-item"><div class="rarity-dot" style="background:var(--gold);box-shadow:0 0 6px var(--gold)"></div>LEGENDARY</div>
+    <div class="rarity-item"><div class="rarity-dot" style="background:var(--accent2);box-shadow:0 0 6px var(--accent2)"></div>EPIC</div>
+    <div class="rarity-item"><div class="rarity-dot" style="background:var(--accent);box-shadow:0 0 6px var(--accent)"></div>RARE</div>
+    <div class="rarity-item"><div class="rarity-dot" style="background:var(--muted)"></div>COMMON</div>
+  </div>
+
+  <div class="inventory-grid reveal">
+    <div class="inv-slot"><div class="rarity legendary"></div><span class="icon">🔶</span><span class="name">Zoho CRM</span></div>
+    <div class="inv-slot"><div class="rarity legendary"></div><span class="icon">⚙️</span><span class="name">Zoho One</span></div>
+    <div class="inv-slot"><div class="rarity legendary"></div><span class="icon">🔮</span><span class="name">Deluge</span></div>
+    <div class="inv-slot"><div class="rarity epic"></div><span class="icon">🌊</span><span class="name">Zoho Flow</span></div>
+    <div class="inv-slot"><div class="rarity epic"></div><span class="icon">📊</span><span class="name">Zoho Analytics</span></div>
+    <div class="inv-slot"><div class="rarity epic"></div><span class="icon">📚</span><span class="name">Zoho Books</span></div>
+    <div class="inv-slot"><div class="rarity epic"></div><span class="icon">🤖</span><span class="name">Zoho Creator</span></div>
+    <div class="inv-slot"><div class="rarity rare"></div><span class="icon">🟠</span><span class="name">HubSpot</span></div>
+    <div class="inv-slot"><div class="rarity rare"></div><span class="icon">☁️</span><span class="name">Salesforce</span></div>
+    <div class="inv-slot"><div class="rarity rare"></div><span class="icon">💬</span><span class="name">Woztell</span></div>
+    <div class="inv-slot"><div class="rarity rare"></div><span class="icon">📞</span><span class="name">Ringover</span></div>
+    <div class="inv-slot"><div class="rarity rare"></div><span class="icon">🌐</span><span class="name">WordPress</span></div>
+    <div class="inv-slot"><div class="rarity rare"></div><span class="icon">📝</span><span class="name">Zoho Sign</span></div>
+    <div class="inv-slot"><div class="rarity rare"></div><span class="icon">🎯</span><span class="name">SalesIQ</span></div>
+    <div class="inv-slot"><div class="rarity common"></div><span class="icon">🎨</span><span class="name">Diseño Gráfico</span></div>
+    <div class="inv-slot"><div class="rarity common"></div><span class="icon">📱</span><span class="name">Zoho Forms</span></div>
+    <div class="inv-slot"><div class="rarity common"></div><span class="icon">📧</span><span class="name">Campaigns</span></div>
+    <div class="inv-slot"><div class="rarity common"></div><span class="icon">📅</span><span class="name">Bookings</span></div>
+    <div class="inv-slot"><div class="rarity common"></div><span class="icon">🖥️</span><span class="name">Zoho Desk</span></div>
+    <div class="inv-slot"><div class="rarity common"></div><span class="icon">🔗</span><span class="name">APIs REST</span></div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ACHIEVEMENTS / LOGROS -->
+<section class="section" id="logros">
+  <div class="section-title reveal">
+    <span class="icon">🏆</span>
+    <h2>Achievements</h2>
+    <div class="line"></div>
+    <span class="tag">LOGROS</span>
+  </div>
+
+  <div class="achievements-grid">
+
+    <div class="achievement reveal">
+      <div class="ach-icon">⚡</div>
+      <div class="ach-info">
+        <h4>Speed Optimizer</h4>
+        <p>Reducción del 30% en tiempos de gestión mediante automatizaciones Zoho en Grupo Colón.</p>
+        <div class="ach-xp">+5000 XP</div>
+      </div>
+    </div>
+
+    <div class="achievement reveal">
+      <div class="ach-icon">🔗</div>
+      <div class="ach-info">
+        <h4>Integration Master</h4>
+        <p>Implementación y personalización de ecosistemas Zoho One completos para múltiples empresas.</p>
+        <div class="ach-xp">+4500 XP</div>
+      </div>
+    </div>
+
+    <div class="achievement reveal">
+      <div class="ach-icon">🎓</div>
+      <div class="ach-info">
+        <h4>Knowledge Spreader</h4>
+        <p>Más de 6 años formando equipos en CRM, diseño, marketing y tecnología.</p>
+        <div class="ach-xp">+3000 XP</div>
+      </div>
+    </div>
+
+    <div class="achievement reveal">
+      <div class="ach-icon">🤖</div>
+      <div class="ach-info">
+        <h4>Bot Whisperer</h4>
+        <p>Desarrollo de chatbots funcionales para web y WhatsApp integrados con CRM.</p>
+        <div class="ach-xp">+2500 XP</div>
+      </div>
+    </div>
+
+    <div class="achievement reveal">
+      <div class="ach-icon">🚀</div>
+      <div class="ach-info">
+        <h4>CTO Unlocked</h4>
+        <p>Ascenso a CTO liderando la transformación digital de un centro de formación profesional.</p>
+        <div class="ach-xp">+6000 XP</div>
+      </div>
+    </div>
+
+    <div class="achievement reveal">
+      <div class="ach-icon">🌐</div>
+      <div class="ach-info">
+        <h4>Omnichannel Architect</h4>
+        <p>Diseño de customer journeys y optimización de procesos multicanal con metodología Agile.</p>
+        <div class="ach-xp">+3500 XP</div>
+      </div>
+    </div>
+
+    <div class="achievement reveal">
+      <div class="ach-icon">🎨</div>
+      <div class="ach-info">
+        <h4>Brand Craftsman</h4>
+        <p>Experto en diseño gráfico, identidad de marca y creación de contenidos audiovisuales.</p>
+        <div class="ach-xp">+2000 XP</div>
+      </div>
+    </div>
+
+    <div class="achievement reveal">
+      <div class="ach-icon">📊</div>
+      <div class="ach-info">
+        <h4>Data Analyst</h4>
+        <p>Experiencia en BI profesional, analíticas web y reporting con Zoho Analytics.</p>
+        <div class="ach-xp">+2800 XP</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- CONTACT / GUILD -->
+<section class="section" id="contacto">
+  <div class="section-title reveal">
+    <span class="icon">⚔️</span>
+    <h2>Join The Guild</h2>
+    <div class="line"></div>
+    <span class="tag">CONTACTO</span>
+  </div>
+
+  <div class="guild-panel reveal">
+    <h3>¿Listo para tu próxima misión?</h3>
+    <p>Colabora con un CTO & Consultor senior especializado en ecosistemas Zoho One y Transformación Digital</p>
+    <div class="contact-links">
+      <a href="mailto:herrerodelgadomario@gmail.com" class="contact-link">
+        <span class="cl-icon">✉️</span> herrerodelgadomario@gmail.com
+      </a>
+      <a href="tel:+34677806921" class="contact-link">
+        <span class="cl-icon">📱</span> 677 80 69 21
+      </a>
+      <a href="https://linkedin.com/in/marioherrerod" target="_blank" class="contact-link">
+        <span class="cl-icon">💼</span> linkedin.com/in/marioherrerod
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span>MARIO HERRERO DELGADO</span> · CTO & Digital Architect<br>
+  Crafted with ♥ · <span>Zoho One Specialist</span> · Madrid, España<br>
+  Referencias disponibles a petición · <span>MHD.exe v2025</span>
+</footer>
+
+<script>
+  // PARTICLES
+  const container = document.getElementById('particles');
+  for (let i = 0; i < 30; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.animationDuration = (8 + Math.random() * 15) + 's';
+    p.style.animationDelay = (Math.random() * 15) + 's';
+    p.style.width = p.style.height = (1 + Math.random() * 2) + 'px';
+    p.style.background = Math.random() > 0.5 ? 'var(--accent)' : 'var(--accent2)';
+    container.appendChild(p);
+  }
+
+  // SCROLL REVEAL
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(r => observer.observe(r));
+
+  // SKILL BARS animate on scroll
+  const skillBars = document.querySelectorAll('.skill-fill');
+  const skillObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.width = e.target.dataset.width + '%';
+        skillObs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.3 });
+  skillBars.forEach(b => skillObs.observe(b));
+
+  // NAV active section highlight
+  window.addEventListener('scroll', () => {
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-links a');
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 80) current = s.id;
+    });
+    navLinks.forEach(a => {
+      a.style.color = a.getAttribute('href') === '#' + current ? 'var(--accent)' : '';
+    });
+  });
+</script>
+
+</body>
+</html>
